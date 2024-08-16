@@ -10,12 +10,13 @@ class NetBIOS
 protected:
     AsyncUDP _udp;
     String _name;
+    tcpip_adapter_if_t _tcpip_adapter;
     void _onPacket(AsyncUDPPacket& packet);
 
 public:
     NetBIOS();
     ~NetBIOS();
-    bool begin(const char *name);
+    bool begin(const char *name,tcpip_adapter_if_t tcpip_adapter = TCPIP_ADAPTER_IF_STA);
     void end();
 };
 

@@ -92,7 +92,11 @@ void NetBIOS::_onPacket(AsyncUDPPacket& packet){
                 append_32((void *)&nbnsa.ttl, 300000);
                 append_16((void *)&nbnsa.data_len, 6);
                 append_16((void *)&nbnsa.flags, 0);
-                nbnsa.addr = WiFi.localIP();
+                tcpip_adapter_ip_info_t ip;
+                if(tcpip_adapter_get_ip_info(_tcpip_adapter, &ip) == ESP_OK){
+                    nbnsa.addr= ip.ip.addr;
+                }
+                // nbnsa.addr = WiFi.localIP();
                 _udp.writeTo((uint8_t *)&nbnsa, sizeof(nbnsa), packet.remoteIP(), NBNS_PORT);
             }
         }
@@ -106,9 +110,10 @@ NetBIOS::~NetBIOS(){
     end();
 }
 
-bool NetBIOS::begin(const char *name){
+bool NetBIOS::begin(const char *name, tcpip_adapter_if_t tcpip_adapter){
     _name = name;
     _name.toUpperCase();
+    _tcpip_adapter = tcpip_adapter;
 
     if(_udp.connected()){
         return true;
